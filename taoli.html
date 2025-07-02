@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>逃离这里 - 恐怖密室逃脱</title>
+    <style>
+        @import url('file:///C:/Users/ASUS/Desktop/1280.avif');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'ZCOOL KuaiLe', cursive;
+            background-color: #000;
+            color: white;
+            overflow: hidden;
+            user-select: none;
+            touch-action: none;
+        }
+        
+        /* 开始页面样式 */
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://cn.bing.com/images/search?view=detailV2&ccid=Yv4%2fz0jT&id=CB971A11C9B75C779B0B825DDFBF8F1F0172DC9B&thid=OIP.Yv4_z0jTc-XwwifFMcs4twHaEK&mediaurl=https%3a%2f%2fpuui.qpic.cn%2fvpic_cover%2fq3335961328%2fq3335961328_hz.jpg%2f1280&exph=720&expw=1280&q=%e7%91%9e%e5%b1%b1%e4%b8%ad%e5%ad%a6&simid=608037696619822892&FORM=IRPRST&ck=02F14EDB5D94640D232534755192A6E5&selectedIndex=4&itb=0');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            z-index: 100;
+        }
+        
+        #start-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+        
+        .title-container {
+            margin-top: 10vh;
+            text-align: center;
+        }
+        
+        .title {
+            font-size: 5rem;
+            color: #a00;
+            text-shadow: 0 0 10px #f00, 0 0 20px #f00;
+            margin-bottom: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a00;
+            margin-bottom: 3rem;
+        }
+        
+        .menu-button {
+            background-color: #300;
+            color: white;
+            border: 2px solid #a00;
+            border-radius: 5px;
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            margin: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+        
+        .menu-button:hover {
+            background-color: #a00;
+            box-shadow: 0 0 10px #f00;
+        }
+        
+        #menu-buttons {
+            position: absolute;
+            left: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 游戏容器 */
+        #game-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            z-index: 50;
+        }
+        
+        /* 剧情文本样式 */
+        .story-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: white;
+            text-align: center;
+            text-shadow: 0 0 5px #a00;
+            cursor: pointer;
+            z-index: 60;
+        }
+        
+        .story-text::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #a00;
+            animation: drip 2s infinite;
+        }
+        
+        /* 按钮样式 */
+        .game-button {
+            position: absolute;
+            background-color: #333;
+            color: white;
+            border: 1px solid #666;
+            border-radius: 3px;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 10;
+            font-family: 'ZCOOL KuaiLe', cursive;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s, color 0.3s;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .game-button.light-on {
+            background-color: #555;
+            color: #fff;
+        }
+        
+        .game-button.light-off {
+            background-color: #222;
+            color: #aaa;
+        }
+        
+        .game-button.disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        
+        /* 连线样式 */
+        .connection-line {
+            position: absolute;
+            background-color: #666;
+            height: 1px;
+            transform-origin: 0 0;
+            z-index: 5;
+        }
+        
+        /* 密码输入样式 */
+        .password-input {
+            position: absolute;
+            display: flex;
+            gap: 5px;
+            z-index: 20;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 5px;
+            border-radius: 3px;
+        }
+        
+        .password-digit {
+            width: 30px;
+            height: 30px;
+            background-color: #333;
+            color: white;
+            border: 1px solid #666;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .password-digit:hover {
+            background-color: #444;
+        }
+        
+        /* 提示信息样式 */
+        .hint-message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(170, 0, 0, 0.7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            z-index: 70;
+            animation: fadeInOut 2s forwards;
+            display: none;
+        }
+        
+        /* 排名页面样式 */
+        #ranking-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        
+        .ranking-title {
+            font-size: 3rem;
+            color: #a00;
+            margin-bottom: 2rem;
+        }
+        
+        .ranking-list {
+            list-style-type: none;
+            padding: 0;
+            width: 300px;
+        }
+        
+        .ranking-item {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .ranking-item:nth-child(1) {
+            color: gold;
+            font-size: 1.5rem;
+        }
+        
+        .ranking-item:nth-child(2) {
+            color: silver;
+        }
+        
+        .ranking-item:nth-child(3) {
+            color: #cd7f32; /* bronze */
+        }
+        
+        .back-button {
+            margin-top: 2rem;
+            background-color: #300;
+            color: white;
+            border: 2px solid #a00;
+            border-radius: 5px;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        /* 名字输入框 */
+        #name-input-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 150;
+        }
+        
+        .name-input-title {
+            font-size: 2rem;
+            color: #a00;
+            margin-bottom: 1rem;
+        }
+        
+        #player-name {
+            background-color: #222;
+            color: white;
+            border: 1px solid #a00;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            width: 200px;
+            text-align: center;
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+        
+        .start-game-button {
+            background-color: #300;
+            color: white;
+            border: 2px solid #a00;
+            border-radius: 5px;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        /* 动画 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes drip {
+            0% { transform: scaleX(0); opacity: 0; }
+            50% { transform: scaleX(1); opacity: 1; }
+            100% { transform: scaleX(1); opacity: 0; }
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        .text-red {
+            color: #f00 !important;
+            transition: color 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <!-- 开始页面 -->
+    <div id="start-screen">
+        <div class="title-container">
+            <h1 class="title">逃离这里</h1>
+            <p class="subtitle">ESCAPE FROM HERE</p>
+        </div>
+        <div id="menu-buttons">
+            <button id="start-button" class="menu-button">开始逃脱</button>
+            <button id="ranking-button" class="menu-button">排名</button>
+        </div>
+    </div>
+    
+    <!-- 名字输入页面 -->
+    <div id="name-input-screen">
+        <h2 class="name-input-title">请输入你的名字</h2>
+        <input type="text" id="player-name" maxlength="10" placeholder="你的名字">
+        <button id="confirm-name" class="start-game-button">开始游戏</button>
+    </div>
+    
+    <!-- 排名页面 -->
+    <div id="ranking-screen">
+        <h2 class="ranking-title">逃脱排名</h2>
+        <ul class="ranking-list" id="ranking-list">
+            <!-- 排名将通过JS动态生成 -->
+        </ul>
+        <button id="back-from-ranking" class="back-button">返回</button>
+    </div>
+    
+    <!-- 游戏容器 -->
+    <div id="game-container">
+        <div class="hint-message" id="hint-message"></div>
+        <!-- 游戏元素将通过JS动态生成 -->
+    </div>
+    
+    <!-- 音频元素 -->
+    <audio id="bgm" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-dark-ambient-horror-38.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="breath-sound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-person-breathing-1931.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="click-sound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-quick-jump-arcade-game-239.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="error-sound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-ominous-drums-227.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="success-sound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="story-sound1">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-horror-laugh-428.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="story-sound2">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-creepy-laugh-222.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="story-sound3">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-creepy-dark-whisper-583.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // 游戏状态
+        const gameState = {
+            playerName: '',
+            startTime: 0,
+            lightOn: false,
+            currentStage: 0,
+            items: {},
+            completed: false,
+            rankings: JSON.parse(localStorage.getItem('escapeRankings')) || []
+        };
+        
+        // DOM元素
+        const startScreen = document.getElementById('start-screen');
+        const gameContainer = document.getElementById('game-container');
+        const nameInputScreen = document.getElementById('name-input-screen');
+        const rankingScreen = document.getElementById('ranking-screen');
+        const rankingList = document.getElementById('ranking-list');
+        const startButton = document.getElementById('start-button');
+        const rankingButton = document.getElementById('ranking-button');
+        const backFromRanking = document.getElementById('back-from-ranking');
+        const confirmName = document.getElementById('confirm-name');
+        const playerNameInput = document.getElementById('player-name');
+        const hintMessage = document.getElementById('hint-message');
+        const bgm = document.getElementById('bgm');
+        const breathSound = document.getElementById('breath-sound');
+        const clickSound = document.getElementById('click-sound');
+        const errorSound = document.getElementById('error-sound');
+        const successSound = document.getElementById('success-sound');
+        const storySound1 = document.getElementById('story-sound1');
+        const storySound2 = document.getElementById('story-sound2');
+        const storySound3 = document.getElementById('story-sound3');
+        
+        // 按钮和连接线存储
+        let buttons = [];
+        let connections = [];
+        let passwordInputs = [];
+        
+        // 初始化游戏
+        function initGame() {
+            // 设置事件监听器
+            startButton.addEventListener('click', showNameInput);
+            rankingButton.addEventListener('click', showRankings);
+            backFromRanking.addEventListener('click', hideRankings);
+            confirmName.addEventListener('click', startGame);
+            
+            // 设置音频
+            bgm.volume = 0.3;
+            breathSound.volume = 0.2;
+            clickSound.volume = 0.3;
+            errorSound.volume = 0.3;
+            successSound.volume = 0.3;
+            storySound1.volume = 0.4;
+            storySound2.volume = 0.4;
+            storySound3.volume = 0.4;
+            
+            // 随机播放呼吸声
+            setInterval(() => {
+                if (Math.random() < 0.2 && gameContainer.style.display === 'block') {
+                    breathSound.currentTime = 0;
+                    breathSound.play();
+                }
+            }, 10000);
+        }
+        
+        // 显示名字输入界面
+        function showNameInput() {
+            playSound(clickSound);
+            nameInputScreen.style.display = 'flex';
+        }
+        
+        // 显示排名
+        function showRankings() {
+            playSound(clickSound);
+            rankingScreen.style.display = 'flex';
+            updateRankingList();
+        }
+        
+        // 隐藏排名
+        function hideRankings() {
+            playSound(clickSound);
+            rankingScreen.style.display = 'none';
+        }
+        
+        // 更新排名列表
+        function updateRankingList() {
+            rankingList.innerHTML = '';
+            
+            // 按时间排序
+            const sortedRankings = [...gameState.rankings].sort((a, b) => a.time - b.time);
+            
+            if (sortedRankings.length === 0) {
+                const item = document.createElement('li');
+                item.className = 'ranking-item';
+                item.textContent = '暂无记录';
+                rankingList.appendChild(item);
+            } else {
+                sortedRankings.slice(0, 10).forEach((record, index) => {
+                    const item = document.createElement('li');
+                    item.className = 'ranking-item';
+                    
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = `${index + 1}. ${record.name}`;
+                    
+                    const timeSpan = document.createElement('span');
+                    const minutes = Math.floor(record.time / 60);
+                    const seconds = Math.floor(record.time % 60);
+                    timeSpan.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    item.appendChild(nameSpan);
+                    item.appendChild(timeSpan);
+                    rankingList.appendChild(item);
+                });
+            }
+        }
+        
+        // 播放音效
+        function playSound(soundElement) {
+            soundElement.currentTime = 0;
+            soundElement.play();
+        }
+        
+        // 开始游戏
+        function startGame() {
+            const name = playerNameInput.value.trim();
+            if (name === '') {
+                playSound(errorSound);
+                alert('请输入你的名字');
+                return;
+            }
+            
+            playSound(clickSound);
+            gameState.playerName = name;
+            nameInputScreen.style.display = 'none';
+            startScreen.style.display = 'none';
+            gameContainer.style.display = 'block';
+            
+            // 开始计时
+            gameState.startTime = Date.now();
+            
+            // 播放背景音乐
+            bgm.play();
+            
+            // 开始游戏流程
+            startStory();
+        }
+        
+        // 开始剧情
+        function startStory() {
+            const storyTexts = [
+                {text: "学校马上就要放假了", sound: storySound1},
+                {text: "可是。。。", sound: storySound2},
+                {text: "奇怪的事情发生了", sound: storySound3}
+            ];
+            
+            showStoryText(storyTexts, 0, () => {
+                // 剧情结束后创建第一个按钮
+                createInitialButton();
+            });
+        }
+        
+        // 显示剧情文本
+        function showStoryText(texts, index, callback) {
+            if (index >= texts.length) {
+                callback();
+                return;
+            }
+            
+            const textElement = document.createElement('div');
+            textElement.className = 'story-text';
+            textElement.textContent = texts[index].text;
+            
+            // 播放对应的音效
+            playSound(texts[index].sound);
+            
+            gameContainer.appendChild(textElement);
+            
+            textElement.addEventListener('click', () => {
+                playSound(clickSound);
+                textElement.remove();
+                showStoryText(texts, index + 1, callback);
+            });
+        }
+        
+        // 创建初始按钮
+        function createInitialButton() {
+            // 清除所有现有按钮和连接线
+            clearAllButtons();
+            
+            // 创建"昏暗的教室"按钮
+            const classroomButton = createButton('昏暗的教室', 'classroom', 
+                window.innerWidth / 2 - 75, window.innerHeight / 2 - 20, true);
+            
+            // 设置按钮可拖动
+            makeDraggable(classroomButton);
+            
+            // 设置按钮点击事件
+            classroomButton.element.addEventListener('click', () => {
+                playSound(clickSound);
+                if (gameState.items['locker'] || gameState.items['box'] || gameState.items['snack']) return;
+                
+                // 生成子按钮
+                const lockerButton = createButton('生锈的柜子', 'locker', 
+                    classroomButton.x - 150, classroomButton.y + 100, true);
+                
+                const boxButton = createButton('带锁的盒子', 'box', 
+                    classroomButton.x, classroomButton.y + 100, false);
+                
+                const snackButton = createButton('一包零食', 'snack', 
+                    classroomButton.x + 150, classroomButton.y + 100, false);
+                
+                // 设置连接线
+                createConnection(classroomButton, lockerButton);
+                createConnection(classroomButton, boxButton);
+                createConnection(classroomButton, snackButton);
+                
+                // 设置按钮可拖动
+                makeDraggable(lockerButton);
+                makeDraggable(boxButton);
+                makeDraggable(snackButton);
+                
+                // 记录已生成的按钮
+                gameState.items['locker'] = true;
+                gameState.items['box'] = true;
+                gameState.items['snack'] = true;
+                
+                // 设置按钮点击事件
+                lockerButton.element.addEventListener('click', () => {
+                    playSound(clickSound);
+                    if (gameState.items['remote']) return;
+                    
+                    // 生成遥控器按钮
+                    const remoteButton = createButton('遥控器', 'remote', 
+                        lockerButton.x - 75, lockerButton.y + 80, true);
+                    
+                    createConnection(lockerButton, remoteButton);
+                    
+                    // 设置按钮可拖动
+                    makeDraggable(remoteButton);
+                    
+                    // 记录已生成的按钮
+                    gameState.items['remote'] = true;
+                    
+                    // 设置遥控器点击事件
+                    remoteButton.element.addEventListener('click', () => {
+                        playSound(clickSound);
+                        if (gameState.items['remoteButtons']) return;
+                        
+                        // 生成开和关按钮
+                        const onButton = createButton('开', 'on', 
+                            remoteButton.x - 50, remoteButton.y + 60, true);
+                        
+                        const offButton = createButton('关', 'off', 
+                            remoteButton.x + 50, remoteButton.y + 60, true);
+                        
+                        createConnection(remoteButton, onButton);
+                        createConnection(remoteButton, offButton);
+                        
+                        // 设置按钮可拖动
+                        makeDraggable(onButton);
+                        makeDraggable(offButton);
+                        
+                        // 记录已生成的按钮
+                        gameState.items['remoteButtons'] = true;
+                        
+                        // 设置开按钮点击事件
+                        onButton.element.addEventListener('click', () => {
+                            playSound(clickSound);
+                            if (gameState.lightOn) return;
+                            
+                            gameState.lightOn = true;
+                            updateLightState();
+                            
+                            // 更新教室按钮
+                            classroomButton.element.textContent = '微暗的教室';
+                            classroomButton.text = '微暗的教室';
+                            
+                            // 显示提示
+                            showHint('已开灯');
+                            playSound(successSound);
+                            
+                            // 解锁其他按钮
+                            boxButton.enabled = true;
+                            boxButton.element.classList.remove('disabled');
+                            
+                            snackButton.enabled = true;
+                            snackButton.element.classList.remove('disabled');
+                            
+                            // 生成额外按钮
+                            if (!gameState.items['student']) {
+                                const studentButton = createButton('一个坐在教室里的同学', 'student', 
+                                    classroomButton.x + 200, classroomButton.y, true);
+                                
+                                const doorButton = createButton('锁住的门', 'door', 
+                                    classroomButton.x - 200, classroomButton.y, true);
+                                
+                                createConnection(classroomButton, studentButton);
+                                createConnection(classroomButton, doorButton);
+                                
+                                // 设置按钮可拖动
+                                makeDraggable(studentButton);
+                                makeDraggable(doorButton);
+                                
+                                // 记录已生成的按钮
+                                gameState.items['student'] = true;
+                                gameState.items['door'] = true;
+                                
+                                // 设置学生按钮点击事件
+                                studentButton.element.addEventListener('click', () => {
+                                    playSound(clickSound);
+                                    if (studentButton.text === '一个坐在教室里的同学') {
+                                        // 显示剧情
+                                        const textElement = document.createElement('div');
+                                        textElement.className = 'story-text';
+                                        textElement.textContent = '这位同学转了过来，你发现她是李佳婧';
+                                        
+                                        playSound(storySound1);
+                                        
+                                        gameContainer.appendChild(textElement);
+                                        
+                                        textElement.addEventListener('click', () => {
+                                            playSound(clickSound);
+                                            textElement.remove();
+                                            
+                                            // 更新按钮文本
+                                            studentButton.element.textContent = '李佳婧';
+                                            studentButton.text = '李佳婧';
+                                            
+                                            // 生成凌乱的桌子按钮
+                                            if (!gameState.items['desk']) {
+                                                const deskButton = createButton('凌乱的桌子', 'desk', 
+                                                    studentButton.x - 100, studentButton.y + 80, true);
+                                                
+                                                createConnection(studentButton, deskButton);
+                                                
+                                                // 设置按钮可拖动
+                                                makeDraggable(deskButton);
+                                                
+                                                // 记录已生成的按钮
+                                                gameState.items['desk'] = true;
+                                                
+                                                // 设置桌子点击事件
+                                                deskButton.element.addEventListener('click', () => {
+                                                    playSound(clickSound);
+                                                    if (gameState.items['papers'] || gameState.items['pens']) return;
+                                                    
+                                                    // 生成数学卷子和笔
+                                                    const papersButton = createButton('三张数学卷子', 'papers', 
+                                                        deskButton.x - 80, deskButton.y + 60, true);
+                                                    
+                                                    const pensButton = createButton('七只笔', 'pens', 
+                                                        deskButton.x + 80, deskButton.y + 60, true);
+                                                    
+                                                    createConnection(deskButton, papersButton);
+                                                    createConnection(deskButton, pensButton);
+                                                    
+                                                    // 设置按钮可拖动
+                                                    makeDraggable(papersButton);
+                                                    makeDraggable(pensButton);
+                                                    
+                                                    // 记录已生成的按钮
+                                                    gameState.items['papers'] = true;
+                                                    gameState.items['pens'] = true;
+                                                });
+                                            }
+                                        });
+                                    } else {
+                                        // 显示提示
+                                        showHint('她好像有点不高兴，也许是太久没放假了');
+                                        playSound(storySound2);
+                                    }
+                                });
+                                
+                                // 设置门按钮点击事件
+                                doorButton.element.addEventListener('click', () => {
+                                    playSound(clickSound);
+                                    if (gameState.items['doorPassword']) return;
+                                    
+                                    // 创建密码输入
+                                    const passwordInput = createPasswordInput(doorButton, 'door');
+                                    
+                                    // 设置密码输入完成回调
+                                    passwordInput.onComplete = (password) => {
+                                        if (password === '504') {
+                                            // 密码正确
+                                            playSound(successSound);
+                                            doorButton.element.textContent = '走出教室';
+                                            doorButton.text = '走出教室';
+                                            
+                                            // 设置门的新点击事件
+                                            doorButton.element.removeEventListener('click', arguments.callee);
+                                            doorButton.element.addEventListener('click', () => {
+                                                playSound(clickSound);
+                                                // 显示结局剧情
+                                                const storyTexts = [
+                                                    {text: "你走出了教室", sound: storySound1},
+                                                    {text: "走廊很昏暗", sound: storySound2},
+                                                    {text: "你似乎听到走廊的尽头传来声音。。。", sound: storySound3}
+                                                ];
+                                                
+                                                showStoryText(storyTexts, 0, () => {
+                                                    // 游戏结束
+                                                    gameCompleted();
+                                                });
+                                            });
+                                        } else {
+                                            playSound(errorSound);
+                                        }
+                                    };
+                                    
+                                    gameState.items['doorPassword'] = true;
+                                });
+                            }
+                        });
+                        
+                        // 设置关按钮点击事件
+                        offButton.element.addEventListener('click', () => {
+                            playSound(clickSound);
+                            if (!gameState.lightOn) return;
+                            
+                            gameState.lightOn = false;
+                            updateLightState();
+                            
+                            // 更新教室按钮
+                            classroomButton.element.textContent = '昏暗的教室';
+                            classroomButton.text = '昏暗的教室';
+                            
+                            // 生成荧光黑板按钮
+                            if (!gameState.items['blackboard']) {
+                                const blackboardButton = createButton('发出荧光的黑板', 'blackboard', 
+                                    classroomButton.x, classroomButton.y - 100, true);
+                                
+                                createConnection(classroomButton, blackboardButton);
+                                
+                                // 设置按钮可拖动
+                                makeDraggable(blackboardButton);
+                                
+                                // 记录已生成的按钮
+                                gameState.items['blackboard'] = true;
+                                
+                                // 设置黑板点击事件
+                                blackboardButton.element.addEventListener('click', () => {
+                                    playSound(clickSound);
+                                    showHint('504');
+                                });
+                            }
+                        });
+                    });
+                });
+                
+                // 设置盒子按钮点击事件
+                boxButton.element.addEventListener('click', () => {
+                    playSound(clickSound);
+                    if (!boxButton.enabled) {
+                        shakeButton(boxButton);
+                        showHint('太黑了，开灯再试试');
+                        playSound(errorSound);
+                        return;
+                    }
+                    
+                    if (gameState.items['boxPassword']) return;
+                    
+                    // 创建密码输入
+                    const passwordInput = createPasswordInput(boxButton, 'box');
+                    
+                    // 设置密码输入完成回调
+                    passwordInput.onComplete = (password) => {
+                        if (password === '307') {
+                            // 密码正确
+                            playSound(successSound);
+                            boxButton.element.textContent = '盒子';
+                            boxButton.text = '盒子';
+                            
+                            // 生成手机按钮
+                            if (!gameState.items['phone']) {
+                                const phoneButton = createButton('手机', 'phone', 
+                                    boxButton.x, boxButton.y + 80, true);
+                                
+                                createConnection(boxButton, phoneButton);
+                                
+                                // 设置按钮可拖动
+                                makeDraggable(phoneButton);
+                                
+                                // 记录已生成的按钮
+                                gameState.items['phone'] = true;
+                                
+                                // 设置手机与其他物品的交互
+                                setupItemInteraction(phoneButton);
+                            }
+                        } else {
+                            playSound(errorSound);
+                        }
+                    };
+                    
+                    gameState.items['boxPassword'] = true;
+                });
+                
+                // 设置零食按钮点击事件
+                snackButton.element.addEventListener('click', () => {
+                    playSound(clickSound);
+                    if (!snackButton.enabled) {
+                        shakeButton(snackButton);
+                        showHint('太黑了，开灯再试试');
+                        playSound(errorSound);
+                        return;
+                    }
+                    
+                    // 设置零食与其他物品的交互
+                    setupItemInteraction(snackButton);
+                });
+            });
+        }
+        
+        // 创建按钮
+        function createButton(text, id, x, y, enabled) {
+            // 确保位置不重叠
+            const adjustedPos = findAvailablePosition(x, y, 150, 40);
+            x = adjustedPos.x;
+            y = adjustedPos.y;
+            
+            const button = document.createElement('button');
+            button.className = `game-button ${gameState.lightOn ? 'light-on' : 'light-off'}`;
+            button.textContent = text;
+            button.style.left = `${x}px`;
+            button.style.top = `${y}px`;
+            
+            if (!enabled) {
+                button.classList.add('disabled');
+            }
+            
+            gameContainer.appendChild(button);
+            
+            const buttonObj = {
+                element: button,
+                text: text,
+                id: id,
+                x: x,
+                y: y,
+                enabled: enabled
+            };
+            
+            buttons.push(buttonObj);
+            return buttonObj;
+        }
+        
+        // 查找可用位置
+        function findAvailablePosition(x, y, width, height, attempt = 0) {
+            if (attempt > 20) {
+                // 尝试多次后随机位置
+                return {
+                    x: Math.max(0, Math.min(x, window.innerWidth - width)),
+                    y: Math.max(0, Math.min(y, window.innerHeight - height))
+                };
+            }
+            
+            let overlap = false;
+            
+            for (const button of buttons) {
+                if (Math.abs(button.x - x) < width + 20 && Math.abs(button.y - y) < height + 20) {
+                    overlap = true;
+                    break;
+                }
+            }
+            
+            if (!overlap) {
+                return { x, y };
+            }
+            
+            // 有重叠，尝试附近位置
+            const angle = attempt * (Math.PI * 2 / 8);
+            const radius = 50 + attempt * 10;
+            
+            const newX = x + Math.cos(angle) * radius;
+            const newY = y + Math.sin(angle) * radius;
+            
+            return findAvailablePosition(newX, newY, width, height, attempt + 1);
+        }
+        
+        // 创建连接线
+        function createConnection(button1, button2) {
+            const line = document.createElement('div');
+            line.className = 'connection-line';
+            gameContainer.appendChild(line);
+            
+            const connection = {
+                element: line,
+                button1: button1,
+                button2: button2
+            };
+            
+            connections.push(connection);
+            updateConnection(connection);
+            
+            return connection;
+        }
+        
+        // 更新连接线位置
+        function updateConnection(connection) {
+            const { element, button1, button2 } = connection;
+            
+            const x1 = button1.x + button1.element.offsetWidth / 2;
+            const y1 = button1.y + button1.element.offsetHeight / 2;
+            const x2 = button2.x + button2.element.offsetWidth / 2;
+            const y2 = button2.y + button2.element.offsetHeight / 2;
+            
+            const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            
+            element.style.width = `${length}px`;
+            element.style.left = `${x1}px`;
+            element.style.top = `${y1}px`;
+            element.style.transform = `rotate(${angle}deg)`;
+        }
+        
+        // 创建密码输入
+        function createPasswordInput(parentButton, type) {
+            // 移除现有的相同类型的密码输入
+            removePasswordInput(type);
+            
+            const container = document.createElement('div');
+            container.className = 'password-input';
+            container.dataset.type = type;
+            
+            const digits = [];
+            for (let i = 0; i < 3; i++) {
+                const digit = document.createElement('div');
+                digit.className = 'password-digit';
+                digit.textContent = '0';
+                digit.dataset.value = '0';
+                digit.dataset.index = i;
+                container.appendChild(digit);
+                
+                digits.push(digit);
+                
+                // 设置数字点击事件
+                digit.addEventListener('click', () => {
+                    playSound(clickSound);
+                    let value = parseInt(digit.dataset.value);
+                    value = (value + 1) % 10;
+                    digit.dataset.value = value;
+                    digit.textContent = value;
+                    
+                    // 检查密码
+                    checkPassword(type);
+                });
+            }
+            
+            // 定位密码输入框
+            container.style.left = `${parentButton.x}px`;
+            container.style.top = `${parentButton.y - 50}px`;
+            
+            gameContainer.appendChild(container);
+            
+            const passwordInput = {
+                element: container,
+                digits: digits,
+                type: type,
+                parentButton: parentButton,
+                onComplete: null
+            };
+            
+            passwordInputs.push(passwordInput);
+            
+            return passwordInput;
+        }
+        
+        // 检查密码
+        function checkPassword(type) {
+            const passwordInput = passwordInputs.find(input => input.type === type);
+            if (!passwordInput) return;
+            
+            const password = passwordInput.digits.map(d => d.dataset.value).join('');
+            
+            // 调用完成回调
+            if (passwordInput.onComplete) {
+                passwordInput.onComplete(password);
+            }
+        }
+        
+        // 移除密码输入
+        function removePasswordInput(type) {
+            const index = passwordInputs.findIndex(input => input.type === type);
+            if (index !== -1) {
+                passwordInputs[index].element.remove();
+                passwordInputs.splice(index, 1);
+            }
+        }
+        
+        // 使按钮可拖动
+        function makeDraggable(button) {
+            let isDragging = false;
+            let offsetX, offsetY;
+            
+            button.element.addEventListener('mousedown', startDrag);
+            button.element.addEventListener('touchstart', startDrag);
+            
+            function startDrag(e) {
+                e.preventDefault();
+                
+                isDragging = true;
+                
+                if (e.type === 'mousedown') {
+                    offsetX = e.clientX - button.x;
+                    offsetY = e.clientY - button.y;
+                } else {
+                    offsetX = e.touches[0].clientX - button.x;
+                    offsetY = e.touches[0].clientY - button.y;
+                }
+                
+                // 置顶
+                button.element.style.zIndex = '15';
+                
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('touchmove', drag);
+                document.addEventListener('mouseup', stopDrag);
+                document.addEventListener('touchend', stopDrag);
+            }
+            
+            function drag(e) {
+                if (!isDragging) return;
+                
+                let clientX, clientY;
+                
+                if (e.type === 'mousemove') {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                } else {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                }
+                
+                button.x = clientX - offsetX;
+                button.y = clientY - offsetY;
+                
+                button.element.style.left = `${button.x}px`;
+                button.element.style.top = `${button.y}px`;
+                
+                // 更新所有相关连接线
+                updateConnectionsForButton(button);
+                
+                // 更新密码输入框位置
+                updatePasswordInputPositions(button);
+            }
+            
+            function stopDrag() {
+                isDragging = false;
+                button.element.style.zIndex = '10';
+                
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('touchmove', drag);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchend', stopDrag);
+            }
+        }
+        
+        // 更新密码输入框位置
+        function updatePasswordInputPositions(parentButton) {
+            passwordInputs.forEach(input => {
+                if (input.parentButton === parentButton) {
+                    input.element.style.left = `${parentButton.x}px`;
+                    input.element.style.top = `${parentButton.y - 50}px`;
+                }
+            });
+        }
+        
+        // 更新按钮的所有连接线
+        function updateConnectionsForButton(button) {
+            connections.forEach(connection => {
+                if (connection.button1 === button || connection.button2 === button) {
+                    updateConnection(connection);
+                }
+            });
+        }
+        
+        // 更新灯光状态
+        function updateLightState() {
+            buttons.forEach(button => {
+                if (gameState.lightOn) {
+                    button.element.classList.remove('light-off');
+                    button.element.classList.add('light-on');
+                } else {
+                    button.element.classList.remove('light-on');
+                    button.element.classList.add('light-off');
+                }
+            });
+        }
+        
+        // 显示提示信息
+        function showHint(text) {
+            hintMessage.textContent = text;
+            hintMessage.style.display = 'block';
+            
+            // 重置动画
+            hintMessage.style.animation = 'none';
+            void hintMessage.offsetWidth; // 触发重绘
+            hintMessage.style.animation = 'fadeInOut 2s forwards';
+            
+            setTimeout(() => {
+                hintMessage.style.display = 'none';
+            }, 2000);
+        }
+        
+        // 按钮震动效果
+        function shakeButton(button) {
+            button.element.classList.add('shake', 'text-red');
+            
+            setTimeout(() => {
+                button.element.classList.remove('shake', 'text-red');
+            }, 500);
+        }
+        
+        // 设置物品交互
+        function setupItemInteraction(itemButton) {
+            // 检查与李佳婧的交互
+            const lijiajingButton = buttons.find(b => b.text === '李佳婧');
+            if (!lijiajingButton) return;
+            
+            itemButton.element.addEventListener('mousedown', startCheckInteraction);
+            itemButton.element.addEventListener('touchstart', startCheckInteraction);
+            
+            function startCheckInteraction(e) {
+                document.addEventListener('mouseup', checkInteraction);
+                document.addEventListener('touchend', checkInteraction);
+            }
+            
+            function checkInteraction(e) {
+                document.removeEventListener('mouseup', checkInteraction);
+                document.removeEventListener('touchend', checkInteraction);
+                
+                // 获取按钮位置
+                const itemRect = itemButton.element.getBoundingClientRect();
+                const lijiajingRect = lijiajingButton.element.getBoundingClientRect();
+                
+                // 检查是否重叠
+                if (!(
+                    itemRect.right < lijiajingRect.left || 
+                    itemRect.left > lijiajingRect.right || 
+                    itemRect.bottom < lijiajingRect.top || 
+                    itemRect.top > lijiajingRect.bottom
+                )) {
+                    // 物品与李佳婧重叠，触发交互
+                    handleItemInteraction(itemButton, lijiajingButton);
+                }
+            }
+        }
+        
+        // 处理物品交互
+        function handleItemInteraction(itemButton, lijiajingButton) {
+            if (itemButton.text === '手机') {
+                // 手机交互
+                showHint('她玩了一把吊五人格，此时非常开心');
+                playSound(successSound);
+                
+                // 移除手机
+                removeButton(itemButton);
+                
+                // 设置零食交互的特殊效果
+                const snackButton = buttons.find(b => b.text === '一包零食');
+                if (snackButton) {
+                    snackButton.specialInteraction = true;
+                }
+            } else if (itemButton.text === '一包零食') {
+                if (itemButton.specialInteraction) {
+                    // 特殊交互
+                    showHint('她非常中二地说黑暗才是我的领域');
+                    playSound(storySound3);
+                    
+                    // 移除零食
+                    removeButton(itemButton);
+                } else {
+                    // 普通交互
+                    showHint('她说她并不是很饿');
+                    playSound(errorSound);
+                    shakeButton(lijiajingButton);
+                }
+            }
+        }
+        
+        // 移除按钮
+        function removeButton(button) {
+            // 移除元素
+            button.element.remove();
+            
+            // 从按钮数组中移除
+            const index = buttons.indexOf(button);
+            if (index !== -1) {
+                buttons.splice(index, 1);
+            }
+            
+            // 移除相关连接线
+            const connectionsToRemove = connections.filter(
+                conn => conn.button1 === button || conn.button2 === button
+            );
+            
+            connectionsToRemove.forEach(conn => {
+                conn.element.remove();
+                const connIndex = connections.indexOf(conn);
+                if (connIndex !== -1) {
+                    connections.splice(connIndex, 1);
+                }
+            });
+        }
+        
+        // 清除所有按钮和连接线
+        function clearAllButtons() {
+            buttons.forEach(button => {
+                button.element.remove();
+            });
+            
+            connections.forEach(connection => {
+                connection.element.remove();
+            });
+            
+            passwordInputs.forEach(input => {
+                input.element.remove();
+            });
+            
+            buttons = [];
+            connections = [];
+            passwordInputs = [];
+        }
+        
+        // 游戏完成
+        function gameCompleted() {
+            gameState.completed = true;
+            
+            // 计算游戏时间（秒）
+            const endTime = Date.now();
+            const timeInSeconds = Math.floor((endTime - gameState.startTime) / 1000);
+            
+            // 添加到排名
+            gameState.rankings.push({
+                name: gameState.playerName,
+                time: timeInSeconds
+            });
+            
+            // 保存到本地存储
+            localStorage.setItem('escapeRankings', JSON.stringify(gameState.rankings));
+            
+            // 显示未完待续
+            const textElement = document.createElement('div');
+            textElement.className = 'story-text';
+            textElement.textContent = '未完待续...';
+            textElement.style.fontSize = '3rem';
+            
+            gameContainer.appendChild(textElement);
+            
+            // 3秒后返回开始页面
+            setTimeout(() => {
+                textElement.remove();
+                clearAllButtons();
+                gameContainer.style.display = 'none';
+                startScreen.style.display = 'flex';
+                
+                // 重置游戏状态
+                resetGameState();
+            }, 3000);
+        }
+        
+        // 重置游戏状态
+        function resetGameState() {
+            gameState.playerName = '';
+            gameState.startTime = 0;
+            gameState.lightOn = false;
+            gameState.currentStage = 0;
+            gameState.items = {};
+            gameState.completed = false;
+        }
+        
+        // 初始化游戏
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
